@@ -12,10 +12,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.worker\.ts$/,
-        loader: "worker-loader",
-      },
-      {
         test: /\.ts$/,
         loader: "ts-loader",
       },
@@ -31,7 +27,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({ template: "./public/index.html" }),
+    new HtmlWebpackPlugin({ template: "./src/index.html" }),
   ],
   devServer: {
     contentBase: path.join(__dirname, "dist"),
