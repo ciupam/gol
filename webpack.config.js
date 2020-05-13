@@ -12,17 +12,24 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
-        loader: "ts-loader",
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
+        },
       },
       {
-        test: /\.scss$/,
+        test: /\.s[ac]ss$/,
+        exclude: /node_modules/,
         use: ["style-loader", "css-loader", "sass-loader"],
       },
     ],
   },
   resolve: {
-    extensions: [".ts", ".js"],
+    extensions: [".js"],
     modules: [path.resolve(__dirname, "./src"), "node_modules"],
   },
   plugins: [
