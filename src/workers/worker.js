@@ -1,39 +1,17 @@
-function reply() {
-  if (arguments.length < 1) {
-    throw new TypeError("reply - takes at least one argument");
-  }
+import * as workerMethods from "./workerMethods";
 
-  postMessage({
-    queryMethodListener: arguments[0],
-    queryMethodArguments: Array.prototype.slice.call(arguments, 1),
-  });
-}
-
-const querableFunctions = {
-  getDifference: function (a, b) {
-    reply("printStuff", a - b);
-  },
-  waitSomeTime: function () {
-    setTimeout(function () {
-      reply("doAlert", 3, "seconds");
-    }, 3000);
-  },
+const defaultReply = (message) => {
+  console.log(message);
 };
 
-function defaultReply(message) {
-  console.log(message);
-}
-
-onmessage = (event) => {
+self.onmessage = (event) => {
   if (
     event.data instanceof Object &&
     event.data.hasOwnProperty("queryMethod") &&
     event.data.hasOwnProperty("queryArguments")
   ) {
-    querableFunctions[event.data.queryMethod].apply(
-      self,
-      event.data.queryArguments
-    );
+    const { queryMethod, queryArguments } = event.data;
+    workerMethods[queryMethod](...queryArguments);
   } else {
     defaultReply(event.data);
   }
