@@ -1,8 +1,6 @@
-import Worker from "worker-loader!./worker";
-
 export function QueryableWorker(defaultListener, onError) {
   const instance = this,
-    worker = new Worker(),
+    worker = new Worker("./worker.js", { type: "module", globalObject: false }),
     listeners = {};
 
   this.defaultListener = defaultListener || function () {};
@@ -28,7 +26,7 @@ export function QueryableWorker(defaultListener, onError) {
   this.sendQuery = function () {
     if (arguments.length < 1) {
       throw new TypeError(
-        "QuerableWorker.sendQuery takes at least one argument"
+        "QuerableWorker.sendQuery takes at least one argument",
       );
     }
 
@@ -46,7 +44,7 @@ export function QueryableWorker(defaultListener, onError) {
     ) {
       listeners[event.data.queryMethodListener].apply(
         instance,
-        event.data.queryMethodArguments
+        event.data.queryMethodArguments,
       );
     } else {
       this.defaultListener.call(instance, event.data);

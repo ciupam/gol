@@ -1,12 +1,13 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const WorkerPlugin = require("worker-plugin");
 
 module.exports = {
   devtool: "inline-source-map",
   entry: "./src/index",
   output: {
-    filename: "bundle.js",
+    filename: "index.js",
     path: path.resolve(__dirname, "dist"),
   },
   module: {
@@ -35,6 +36,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({ template: "./src/index.html" }),
+    new WorkerPlugin(),
   ],
   devServer: {
     contentBase: path.join(__dirname, "dist"),
