@@ -1,4 +1,4 @@
-import * as workerMethods from "./workerMethods";
+import * as workerMethods from "./workerUtil";
 
 const defaultReply = (message) => {
   console.log(message);
