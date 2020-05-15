@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const WorkerPlugin = require("worker-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   devtool: "inline-source-map",
@@ -37,6 +38,7 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({ template: "./src/index.html" }),
     new WorkerPlugin(),
+    new CopyPlugin([{ from: "src/assets", to: "assets" }]),
   ],
   devServer: {
     contentBase: path.join(__dirname, "dist"),
