@@ -1,4 +1,5 @@
-import Grid from "./Grid";
 import QueryableWorker from "./QueryableWorker";
+import SharedGrid from "./SharedGrid";
+import WorkerManager from "./WorkerManager";
 
-export { Grid, QueryableWorker };
+export { QueryableWorker, SharedGrid, WorkerManager };
