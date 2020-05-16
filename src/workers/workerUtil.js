@@ -22,6 +22,23 @@ export const waitSomeTime = () => {
   }, 3000);
 };
 
-export const setGridShare = (sharedArrayBuffer, height, width) => {
+export const initSharedGrid = (
+  sharedArrayBuffer,
+  sharedArrayBufferTmp,
+  sharedDisplayFlag,
+  height,
+  width
+) => {
+  sharedGrid = new SharedGrid(
+    sharedArrayBuffer,
+    sharedArrayBufferTmp,
+    sharedDisplayFlag,
+    height,
+    width
+  );
+  reply("printStuff", "Shared Grid init done");
+};
+
+export const calcNextState = (sharedArrayBuffer, height, width) => {
   sharedGrid = new SharedGrid(sharedArrayBuffer, height, width);
 };
