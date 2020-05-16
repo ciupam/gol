@@ -21,7 +21,8 @@ export default class QueryableWorker {
         event.data.hasOwnProperty("queryMethodArguments")
       ) {
         const { queryMethodListener, queryMethodArguments } = event.data;
-        this.#listeners[queryMethodListener](...queryMethodArguments);
+        this.#listeners[queryMethodListener] &&
+          this.#listeners[queryMethodListener](...queryMethodArguments);
       } else {
         this.#defaultListener(event.data);
       }
