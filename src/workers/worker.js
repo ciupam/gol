@@ -11,7 +11,7 @@ self.onmessage = (event) => {
     event.data.hasOwnProperty("queryArguments")
   ) {
     const { queryMethod, queryArguments } = event.data;
-    workerMethods[queryMethod](...queryArguments);
+    workerMethods[queryMethod] && workerMethods[queryMethod](...queryArguments);
   } else {
     defaultReply(event.data);
   }
