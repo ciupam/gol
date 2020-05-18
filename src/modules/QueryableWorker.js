@@ -10,9 +10,10 @@ export default class QueryableWorker {
   };
 
   constructor(defaultListener, onError) {
-    this.#defaultListener = typeof defaultListener === "function" || (() => {});
+    this.#defaultListener =
+      typeof defaultListener === "function" ? defaultListener : () => {};
 
-    if (onError) this.#worker.onerror;
+    if (onError) this.#worker.onerror = onError;
 
     this.#worker.onmessage = (event) => {
       if (
