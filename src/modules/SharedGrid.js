@@ -1,17 +1,20 @@
 export default class SharedGrid {
-  static #DEAD_CELL = 0;
-  static #ALIVE_CELL = 1;
-  #grid; // shared
-  #gridTmp; // shared
+  static DEAD_CELL = 0;
+  static ALIVE_CELL = 1;
+
+  // shared arrays
+  #grid;
+  #gridTmp;
+  #isGridDisplayed;
+
   #height;
   #width;
-  #isGridDisplayed; // shared
 
-  get getHeight() {
+  get height() {
     return this.#height;
   }
 
-  get getWidth() {
+  get width() {
     return this.#width;
   }
 
@@ -54,7 +57,7 @@ export default class SharedGrid {
   clearGrid(grid) {
     for (let i = 0; i < this.#height; i++)
       for (let j = 0; j < this.#width; j++)
-        this.setCell(grid, i, j, SharedGrid.#DEAD_CELL);
+        this.setCell(grid, i, j, SharedGrid.DEAD_CELL);
   }
 
   getCell(grid, i, j) {
@@ -110,15 +113,15 @@ export default class SharedGrid {
     let alive = 0;
 
     neighbors.forEach((c) => {
-      if (c === SharedGrid.#ALIVE_CELL) alive++;
+      if (c === SharedGrid.ALIVE_CELL) alive++;
     });
 
     const value =
       alive === 3
-        ? SharedGrid.#ALIVE_CELL
-        : cell === SharedGrid.#ALIVE_CELL && alive === 2
-        ? SharedGrid.#ALIVE_CELL
-        : SharedGrid.#DEAD_CELL;
+        ? SharedGrid.ALIVE_CELL
+        : cell === SharedGrid.ALIVE_CELL && alive === 2
+        ? SharedGrid.ALIVE_CELL
+        : SharedGrid.DEAD_CELL;
 
     this.setCell(this.gridToWrite(), i, j, value);
   }
