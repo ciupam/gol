@@ -72,6 +72,14 @@ export default class SharedGrid {
     return [0, 0];
   }
 
+  getArrayCell(grid, x) {
+    if (!(grid instanceof Int8Array))
+      throw new TypeError(
+        "SharedGrid.getCell requires Int8Array as first argument"
+      );
+    return this.getCell(grid, ...this.getCoords(x));
+  }
+
   setArrayCell(x, value) {
     this.setCell(...this.getCoords(x), value);
   }
