@@ -67,7 +67,7 @@ export default class SharedGrid {
       );
     const m = i >= this.#height ? 0 : i < 0 ? this.#height - 1 : i;
     const n = j >= this.#width ? 0 : j < 0 ? this.#width - 1 : j;
-    return Atomics.load(this.#grid, m * this.#width + n);
+    return Atomics.load(grid, m * this.#width + n);
   }
 
   setCell(grid, i, j, value) {

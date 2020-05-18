@@ -1,14 +1,34 @@
 import "./styles/index.scss";
-import { QueryableWorker } from "./workers/main";
+import "./styles/reset.css";
 
-var myTask = new QueryableWorker();
+import { WorkerManager, Canvas, SharedGrid } from "./modules";
 
-myTask.addListener("printStuff", function (res) {
-  console.log(res);
+const gridHeight = 8;
+const gridWidth = 10;
+
+const canvas = new Canvas("#canvas", gridHeight, gridWidth);
+const workerManager = new WorkerManager(gridHeight, gridWidth);
+workerManager.initWebWorkers();
+
+window.addEventListener("resize", () => {
+  canvas.setSize();
+  render();
 });
 
-myTask.addListener("doAlert", (time, unit) =>
-  alert(`Work waited for ${time}${unit}.`)
-);
+const render = () => {
+  canvas.drawGrid();
+};
+render();
 
-myTask.sendQuery("getDifference", 5, 3);
+canvas.canvas.onmousedown = ({ offsetX, offsetY }) => {
+  const cords = canvas.cordsToCell(offsetX, offsetY);
+  const cell = workerManager.getCellToDisplay(...cords);
+  console.log(cell);
+  canvas.fillCell(
+    ...cords,
+    cell === SharedGrid.DEAD_CELL
+      ? Canvas.ALIVE_CELL_FILL
+      : Canvas.DEAD_CELL_FILL
+  );
+  workerManager.toggleCellToDisplay(...cords);
+};
