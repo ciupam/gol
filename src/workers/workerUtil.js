@@ -1,6 +1,6 @@
 import SharedGrid from "modules/SharedGrid";
 
-let sharedGrid;
+const sharedGrid = new SharedGrid();
 
 const reply = (queryMethodListener, ...queryMethodArguments) => {
   if (arguments.length < 1)
@@ -29,7 +29,7 @@ export const initSharedGrid = (
   height,
   width
 ) => {
-  sharedGrid = new SharedGrid(
+  sharedGrid.initSharedGrid(
     sharedArrayBuffer,
     sharedArrayBufferTmp,
     sharedDisplayFlag,

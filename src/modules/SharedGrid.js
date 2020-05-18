@@ -7,7 +7,7 @@ export default class SharedGrid {
   #width;
   #isGridDisplayed; // shared
 
-  constructor(
+  initSharedGrid(
     sharedArrayBuffer,
     sharedArrayBufferTmp,
     sharedDisplayFlag,

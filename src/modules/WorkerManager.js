@@ -4,8 +4,11 @@ import SharedGrid from "./SharedGrid";
 export default class WorkerManager {
   #workerNo = window.navigator.hardwareConcurrency - 1;
   #workers = [];
+
   #sharedGrid;
   #isGridDisplayed; // shared
+
+  // memory buffers
   #sharedArrayBuffer;
   #sharedArrayBufferTmp;
   #sharedDisplayFlag;
@@ -14,7 +17,9 @@ export default class WorkerManager {
     this.#sharedArrayBuffer = new SharedArrayBuffer(height * width);
     this.#sharedArrayBufferTmp = new SharedArrayBuffer(height * width);
     this.#sharedDisplayFlag = new SharedArrayBuffer(1);
-    this.#sharedGrid = new SharedGrid(
+
+    this.#sharedGrid = new SharedGrid();
+    this.#sharedGrid.initSharedGrid(
       this.#sharedArrayBuffer,
       this.#sharedArrayBufferTmp,
       this.#sharedDisplayFlag,
@@ -42,7 +47,9 @@ export default class WorkerManager {
     }
   }
 
-  toggleDisplayFlag() {
+  initGrid;
+
+  #toggleDisplayFlag() {
     const flag = Atomics.load(this.#isGridDisplayed, 0);
     Atomics.exchange(this.#isGridDisplayed, 0, !!flag ? 0 : 1);
   }
