@@ -42,8 +42,8 @@ export default class WorkerManager {
         this.#sharedArrayBuffer,
         this.#sharedArrayBufferTmp,
         this.#sharedDisplayFlag,
-        height,
-        width
+        this.#sharedGrid.height,
+        this.#sharedGrid.width
       );
     }
   }
@@ -51,6 +51,22 @@ export default class WorkerManager {
   scatterQuery(queryMethod, ...queryArguments) {
     for (let i = 0; i < this.#workerNo; i++)
       this.#workers[i].sendQuery(queryMethod, ...queryArguments);
+  }
+
+  getCellToDisplay(i, j) {
+    return this.#sharedGrid.getCell(this.#sharedGrid.gridToDisplay(), i, j);
+  }
+
+  toggleCellToDisplay(i, j) {
+    const gridToDisplay = this.#sharedGrid.gridToDisplay();
+    this.#sharedGrid.setCell(
+      gridToDisplay,
+      i,
+      j,
+      this.#sharedGrid.getCell(gridToDisplay, i, j) === SharedGrid.DEAD_CELL
+        ? SharedGrid.ALIVE_CELL
+        : SharedGrid.DEAD_CELL
+    );
   }
 
   #toggleDisplayFlag() {
