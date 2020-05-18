@@ -29,13 +29,14 @@ export default class WorkerManager {
 
     this.#isGridDisplayed = new Int8Array(this.#sharedDisplayFlag);
     Atomics.exchange(this.#isGridDisplayed, 0, 0);
+  }
 
+  initWebWorkers() {
     for (let i = 0; i < this.#workerNo; i++) {
       this.#workers.push(new QueryableWorker());
       this.#workers[i].addListener("printStuff", (message) =>
         console.log(message)
       );
-      this.#workers[i].addListener();
       this.#workers[i].sendQuery(
         "initSharedGrid",
         this.#sharedArrayBuffer,
@@ -47,7 +48,10 @@ export default class WorkerManager {
     }
   }
 
-  initGrid;
+  scatterQuery(queryMethod, ...queryArguments) {
+    for (let i = 0; i < this.#workerNo; i++)
+      this.#workers[i].sendQuery(queryMethod, ...queryArguments);
+  }
 
   #toggleDisplayFlag() {
     const flag = Atomics.load(this.#isGridDisplayed, 0);
