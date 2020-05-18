@@ -7,6 +7,14 @@ export default class SharedGrid {
   #width;
   #isGridDisplayed; // shared
 
+  get getHeight() {
+    return this.#height;
+  }
+
+  get getWidth() {
+    return this.#width;
+  }
+
   initSharedGrid(
     sharedArrayBuffer,
     sharedArrayBufferTmp,
