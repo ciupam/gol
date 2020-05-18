@@ -51,10 +51,10 @@ export default class SharedGrid {
       : this.#gridTmp;
   }
 
-  clearGrid() {
+  clearGrid(grid) {
     for (let i = 0; i < this.#height; i++)
       for (let j = 0; j < this.#width; j++)
-        this.setCell(i, j, SharedGrid.#DEAD_CELL);
+        this.setCell(grid, i, j, SharedGrid.#DEAD_CELL);
   }
 
   getCell(grid, i, j) {
@@ -67,8 +67,12 @@ export default class SharedGrid {
     return Atomics.load(this.#grid, m * this.#width + n);
   }
 
-  setCell(i, j, value) {
-    Atomics.exchange(this.gridToWrite(), i * this.#width + j, value);
+  setCell(grid, i, j, value) {
+    if (!(grid instanceof Int8Array))
+      throw new TypeError(
+        "SharedGrid.getCell requires Int8Array as first argument"
+      );
+    Atomics.exchange(grid, i * this.#width + j, value);
   }
 
   getCoords(x) {
@@ -81,15 +85,11 @@ export default class SharedGrid {
   }
 
   getArrayCell(grid, x) {
-    if (!(grid instanceof Int8Array))
-      throw new TypeError(
-        "SharedGrid.getCell requires Int8Array as first argument"
-      );
     return this.getCell(grid, ...this.getCoords(x));
   }
 
-  setArrayCell(x, value) {
-    this.setCell(...this.getCoords(x), value);
+  setArrayCell(grid, x, value) {
+    this.setCell(grid, ...this.getCoords(x), value);
   }
 
   getNeighbors(i, j) {
@@ -120,6 +120,6 @@ export default class SharedGrid {
         ? SharedGrid.#ALIVE_CELL
         : SharedGrid.#DEAD_CELL;
 
-    this.setCell(i, j, value);
+    this.setCell(this.gridToWrite(), i, j, value);
   }
 }
