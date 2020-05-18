@@ -92,10 +92,6 @@ export default class SharedGrid {
     this.setCell(...this.getCoords(x), value);
   }
 
-  getNextArrayCellState(x) {
-    return this.getNextCellState(...this.getCoords(x));
-  }
-
   getNeighbors(i, j) {
     const neighbors = [];
     for (let a = -1; a < 2; a++)
@@ -104,17 +100,26 @@ export default class SharedGrid {
     return neighbors;
   }
 
-  getNextCellState(i, j) {
+  setNextArrayCellState(x) {
+    this.setNextCellState(...this.getCoords(x));
+  }
+
+  setNextCellState(i, j) {
     const cell = this.getCell(this.gridToDisplay(), i, j);
     const neighbors = this.getNeighbors(i, j);
     let alive = 0;
+
     neighbors.forEach((c) => {
       if (c === SharedGrid.#ALIVE_CELL) alive++;
     });
-    return alive === 3
-      ? SharedGrid.#ALIVE_CELL
-      : cell === SharedGrid.#ALIVE_CELL && alive === 2
-      ? SharedGrid.#ALIVE_CELL
-      : SharedGrid.#DEAD_CELL;
+
+    const value =
+      alive === 3
+        ? SharedGrid.#ALIVE_CELL
+        : cell === SharedGrid.#ALIVE_CELL && alive === 2
+        ? SharedGrid.#ALIVE_CELL
+        : SharedGrid.#DEAD_CELL;
+
+    this.setCell(i, j, value);
   }
 }
