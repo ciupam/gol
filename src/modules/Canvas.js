@@ -22,7 +22,7 @@ export default class Canvas {
   }
 
   getParentWidth() {
-    return this.#canvas.parentElement.scrollWidth;
+    return this.#canvas.parentElement.clientWidth;
   }
 
   setGrid(gridHeight, gridWidth) {
@@ -53,24 +53,36 @@ export default class Canvas {
     return [Math.floor(y / this.#cellSize), Math.floor(x / this.#cellSize)];
   }
 
-  drawCell(i, j) {
+  drawBorder(i, j, value) {
     this.#ctx.beginPath();
     this.#ctx.lineWidth = Canvas.#LINE_WIDTH;
+    this.#ctx.strokeStyle = value;
     this.#ctx.rect(...this.cellToCords(i, j), this.#cellSize, this.#cellSize);
     this.#ctx.stroke();
   }
 
-  drawGrid() {
-    for (let i = 0; i < this.#gridHeight; i++)
-      for (let j = 0; j < this.#gridWidth; j++) this.drawCell(i, j);
+  // fill cell without borders
+  fillCell(i, j, fill = Canvas.ALIVE_CELL_FILL) {
+    const cords = this.cellToCords(i, j);
+    cords[0] += 1;
+    cords[1] += 1;
+
+    this.#ctx.fillStyle = fill;
+    this.#ctx.fillRect(...cords, this.#cellSize - 2, this.#cellSize - 2);
   }
 
-  fillCell(i, j, fill = Canvas.ALIVE_CELL_FILL) {
-    this.#ctx.fillStyle = fill;
-    this.#ctx.fillRect(
-      ...this.cellToCords(i, j),
-      this.#cellSize,
-      this.#cellSize
-    );
+  // fill whole cell with black color
+  fillCellAlive(i, j) {
+    const cords = this.cellToCords(i, j);
+    this.#ctx.fillStyle = Canvas.ALIVE_CELL_FILL;
+    this.#ctx.fillRect(...cords, this.#cellSize, this.#cellSize);
+  }
+
+  // fill whole cell with white color and then drawCell (looks better than just fillCell)
+  fillCellDead(i, j) {
+    const cords = this.cellToCords(i, j);
+    this.#ctx.fillStyle = Canvas.DEAD_CELL_FILL;
+    this.#ctx.fillRect(...cords, this.#cellSize, this.#cellSize);
+    this.drawBorder(i, j, Canvas.ALIVE_CELL_FILL);
   }
 }
