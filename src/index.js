@@ -3,8 +3,12 @@ import "./styles/reset.css";
 
 import { WorkerManager, Canvas, SharedGrid } from "./modules";
 
-const gridHeight = 8;
-const gridWidth = 10;
+const nextButton = document.querySelector(".button--start");
+const heightInput = document.querySelector(".input--height > input");
+heightInput.oninput = () => console.log(heightInput.value, heightInput.max);
+
+const gridHeight = 50;
+const gridWidth = 100;
 
 const canvas = new Canvas("#canvas", gridHeight, gridWidth);
 const workerManager = new WorkerManager(gridHeight, gridWidth);
@@ -16,19 +20,25 @@ window.addEventListener("resize", () => {
 });
 
 const render = () => {
-  canvas.drawGrid();
+  for (let i = 0; i < gridHeight; i++)
+    for (let j = 0; j < gridWidth; j++)
+      if (workerManager.getCellToDisplay(i, j) === SharedGrid.ALIVE_CELL)
+        canvas.fillCellAlive(i, j);
+      else canvas.fillCellDead(i, j);
 };
 render();
 
 canvas.canvas.onmousedown = ({ offsetX, offsetY }) => {
   const cords = canvas.cordsToCell(offsetX, offsetY);
   const cell = workerManager.getCellToDisplay(...cords);
-  console.log(cell);
-  canvas.fillCell(
-    ...cords,
-    cell === SharedGrid.DEAD_CELL
-      ? Canvas.ALIVE_CELL_FILL
-      : Canvas.DEAD_CELL_FILL
-  );
+
+  if (cell === SharedGrid.ALIVE_CELL) canvas.fillCellDead(...cords);
+  else canvas.fillCellAlive(...cords);
+
   workerManager.toggleCellToDisplay(...cords);
+};
+
+nextButton.onclick = () => {
+  workerManager.calcNextState();
+  render();
 };
