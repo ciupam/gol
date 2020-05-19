@@ -69,8 +69,13 @@ export default class WorkerManager {
     );
   }
 
-  #toggleDisplayFlag() {
+  toggleDisplayFlag() {
     const flag = Atomics.load(this.#isGridDisplayed, 0);
     Atomics.exchange(this.#isGridDisplayed, 0, !!flag ? 0 : 1);
+  }
+
+  calcNextState() {
+    this.#sharedGrid.setNextShareState();
+    this.toggleDisplayFlag();
   }
 }
