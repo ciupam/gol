@@ -99,7 +99,8 @@ export default class SharedGrid {
     const neighbors = [];
     for (let a = -1; a < 2; a++)
       for (let b = -1; b < 2; b++)
-        neighbors.push(this.getCell(this.gridToDisplay(), i + a, j + b));
+        if (a !== 0 || b !== 0)
+          neighbors.push(this.getCell(this.gridToDisplay(), i + a, j + b));
     return neighbors;
   }
 
@@ -124,5 +125,16 @@ export default class SharedGrid {
         : SharedGrid.DEAD_CELL;
 
     this.setCell(this.gridToWrite(), i, j, value);
+  }
+
+  setNextShareState(a = 0, b = this.#height * this.#width) {
+    if (typeof a !== "number" || typeof b !== "number" || a < 0 || b < 0)
+      throw new TypeError(
+        "SharedGrid.setNextShareState should be run with no arguments or with two positive integers"
+      );
+
+    if (a > b) [a, b] = [b, a];
+
+    for (let x = a; x < b; x++) this.setNextArrayCellState(x);
   }
 }
