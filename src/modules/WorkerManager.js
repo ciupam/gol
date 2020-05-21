@@ -13,6 +13,8 @@ export default class WorkerManager {
   #sharedArrayBufferTmp;
   #sharedDisplayFlag;
 
+  receivedGridAnswers = 0;
+
   constructor(height, width) {
     this.#sharedArrayBuffer = new SharedArrayBuffer(height * width);
     this.#sharedArrayBufferTmp = new SharedArrayBuffer(height * width);
@@ -53,6 +55,11 @@ export default class WorkerManager {
       this.#workers[i].sendQuery(queryMethod, ...queryArguments);
   }
 
+  scatterListener(name, listener) {
+    for (let i = 0; i < this.#workerNo; i++)
+      this.#workers[i].addListener(name, listener);
+  }
+
   getCellToDisplay(i, j) {
     return this.#sharedGrid.getCell(this.#sharedGrid.gridToDisplay(), i, j);
   }
@@ -77,5 +84,25 @@ export default class WorkerManager {
   calcNextState() {
     this.#sharedGrid.setNextShareState();
     this.toggleDisplayFlag();
+  }
+
+  calcNextStateParallel() {
+    const len = this.#sharedGrid.height * this.#sharedGrid.width;
+    const mod = len % this.#workerNo;
+    const share = Math.floor(len / this.#workerNo);
+
+    const a = this.#workerNo - mod;
+
+    for (let i = 0; i < a; i++)
+      this.#workers[i].sendQuery("setNextShareState", i * share, i * share * 2);
+
+    const offset = share * a;
+
+    for (let i = a; i < this.#workerNo; i++)
+      this.#workers[i].sendQuery(
+        "setNextShareState",
+        offset + (i - a) * (share + 1),
+        offset + (i - a) * (share + 1) * 2
+      );
   }
 }

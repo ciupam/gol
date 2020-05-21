@@ -39,6 +39,11 @@ export const initSharedGrid = (
   reply("printStuff", "Shared Grid init done");
 };
 
+export const setNextShareState = (a, b) => {
+  sharedGrid.setNextShareState(a, b);
+  reply("gridAnswer");
+};
+
 export const calcNextState = (sharedArrayBuffer, height, width) => {
   sharedGrid = new SharedGrid(sharedArrayBuffer, height, width);
 };
