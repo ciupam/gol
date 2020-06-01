@@ -54,4 +54,8 @@ export default class QueryableWorker {
       queryArguments,
     });
   }
+
+  destroyWorker() {
+    this.#worker.terminate();
+  }
 }

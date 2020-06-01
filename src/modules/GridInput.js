@@ -1,6 +1,6 @@
 export default class GridInput {
   static #DEFAULT_HEIGHT = 50;
-  static #DEFAULT_WIDTH = 80;
+  static #DEFAULT_WIDTH = 110;
   #heightInput;
   #widthInput;
 
@@ -17,7 +17,7 @@ export default class GridInput {
 
   handleChange(input) {
     return () => {
-      const e = new Event("resize");
+      const e = new Event("gridChange");
       window.dispatchEvent(e);
     };
   }

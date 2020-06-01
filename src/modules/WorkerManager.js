@@ -13,7 +13,7 @@ export default class WorkerManager {
   #sharedArrayBufferTmp;
   #sharedDisplayFlag;
 
-  receivedGridAnswers = 0;
+  #receivedGridAnswers = 0;
 
   constructor(height, width) {
     this.#sharedArrayBuffer = new SharedArrayBuffer(height * width);
@@ -31,6 +31,12 @@ export default class WorkerManager {
 
     this.#isGridDisplayed = new Int8Array(this.#sharedDisplayFlag);
     Atomics.exchange(this.#isGridDisplayed, 0, 0);
+  }
+
+  destroyWebWorkers() {
+    for (let i = 0; i < this.#workerNo; i++) {
+      this.#workers[i].destroyWorker();
+    }
   }
 
   initWebWorkers() {
@@ -94,7 +100,11 @@ export default class WorkerManager {
     const a = this.#workerNo - mod;
 
     for (let i = 0; i < a; i++)
-      this.#workers[i].sendQuery("setNextShareState", i * share, i * share * 2);
+      this.#workers[i].sendQuery(
+        "setNextShareState",
+        i * share,
+        (i + 1) * share
+      );
 
     const offset = share * a;
 
@@ -102,7 +112,21 @@ export default class WorkerManager {
       this.#workers[i].sendQuery(
         "setNextShareState",
         offset + (i - a) * (share + 1),
-        offset + (i - a) * (share + 1) * 2
+        offset + (i - a + 1) * (share + 1)
       );
+  }
+
+  clearDisplaySharedGrid() {
+    this.#sharedGrid.clearGrid(this.#sharedGrid.gridToDisplay());
+  }
+
+  // true if answers received from all threads, false - otherwise
+  incrGridAnswer() {
+    if (++this.#receivedGridAnswers >= this.#workerNo) {
+      this.#receivedGridAnswers = 0;
+      return true;
+    }
+
+    return false;
   }
 }

@@ -4,9 +4,7 @@ import "./styles/reset.css";
 import { WorkerManager, Canvas, SharedGrid, GridInput } from "./modules";
 
 const nextButton = document.querySelector(".button--start");
-
-const gridHeight = 50;
-const gridWidth = 100;
+const clearButton = document.querySelector(".button--clear");
 
 const gridInput = new GridInput(
   ".input--height > input",
@@ -22,9 +20,7 @@ let workerManager = new WorkerManager(
 workerManager.initWebWorkers();
 
 window.addEventListener("resize", () => {
-  workerManager = new WorkerManager(gridInput.gridHeight, gridInput.gridWidth);
-  workerManager.initWebWorkers();
-  canvas.setGrid(gridInput.gridHeight, gridInput.gridWidth);
+  canvas.setSize();
   render();
 });
 
@@ -37,6 +33,31 @@ const render = () => {
 };
 render();
 
+let clicked = false;
+window.addEventListener("gridChange", () => {
+  if (clicked) {
+    clicked = !clicked;
+    clearTimeout(timeoutId);
+    nextButton.innerHTML = "Start";
+  }
+  workerManager.destroyWebWorkers();
+  workerManager = new WorkerManager(gridInput.gridHeight, gridInput.gridWidth);
+  workerManager.initWebWorkers();
+  workerManager.scatterListener("gridAnswer", () => {
+    if (workerManager.incrGridAnswer()) {
+      workerManager.toggleDisplayFlag();
+      window.dispatchEvent(rerenderEvent);
+    }
+  });
+  canvas.setGrid(gridInput.gridHeight, gridInput.gridWidth);
+  render();
+});
+
+const rerenderEvent = new Event("rerender");
+window.addEventListener("rerender", () => {
+  render();
+});
+
 canvas.canvas.onmousedown = ({ offsetX, offsetY }) => {
   const cords = canvas.cordsToCell(offsetX, offsetY);
   const cell = workerManager.getCellToDisplay(...cords);
@@ -47,7 +68,28 @@ canvas.canvas.onmousedown = ({ offsetX, offsetY }) => {
   workerManager.toggleCellToDisplay(...cords);
 };
 
+workerManager.scatterListener("gridAnswer", () => {
+  if (workerManager.incrGridAnswer()) {
+    workerManager.toggleDisplayFlag();
+    window.dispatchEvent(rerenderEvent);
+  }
+});
+
+let timeoutId;
+const timeoutNext = () => {
+  workerManager.calcNextStateParallel();
+  //render();
+  timeoutId = setTimeout(timeoutNext, 150);
+};
+
 nextButton.onclick = () => {
-  workerManager.calcNextState();
+  clicked = !clicked;
+  nextButton.innerHTML = clicked ? "Stop" : "Start";
+  if (clicked) timeoutNext();
+  else clearTimeout(timeoutId);
+};
+
+clearButton.onclick = () => {
+  workerManager.clearDisplaySharedGrid();
   render();
 };
