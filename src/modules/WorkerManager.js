@@ -120,6 +120,10 @@ export default class WorkerManager {
     this.#sharedGrid.clearGrid(this.#sharedGrid.gridToDisplay());
   }
 
+  randomizeDisplaySharedGrid() {
+    this.#sharedGrid.randomizeGrid(this.#sharedGrid.gridToDisplay());
+  }
+
   // true if answers received from all threads, false - otherwise
   incrGridAnswer() {
     if (++this.#receivedGridAnswers >= this.#workerNo) {

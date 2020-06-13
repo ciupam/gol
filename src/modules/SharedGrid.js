@@ -60,6 +60,16 @@ export default class SharedGrid {
         this.setCell(grid, i, j, SharedGrid.DEAD_CELL);
   }
 
+  randomizeGrid(grid) {
+    for (let i = 0; i < this.#height; i++)
+      for (let j = 0; j < this.#width; j++)
+        if (Math.random() > 0.5) {
+          this.setCell(grid, i, j, SharedGrid.DEAD_CELL);
+        } else {
+          this.setCell(grid, i, j, SharedGrid.ALIVE_CELL);
+        }
+  }
+
   getCell(grid, i, j) {
     if (!(grid instanceof Int8Array))
       throw new TypeError(

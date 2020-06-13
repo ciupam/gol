@@ -5,6 +5,7 @@ import { WorkerManager, Canvas, SharedGrid, GridInput } from "./modules";
 
 const nextButton = document.querySelector(".button--start");
 const clearButton = document.querySelector(".button--clear");
+const randomizeButton = document.querySelector(".button--randomize");
 
 const gridInput = new GridInput(
   ".input--height > input",
@@ -91,5 +92,10 @@ nextButton.onclick = () => {
 
 clearButton.onclick = () => {
   workerManager.clearDisplaySharedGrid();
+  render();
+};
+
+randomizeButton.onclick = () => {
+  workerManager.randomizeDisplaySharedGrid();
   render();
 };
