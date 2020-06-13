@@ -1,7 +1,13 @@
 import "./styles/index.scss";
 import "./styles/reset.css";
 
-import { WorkerManager, Canvas, SharedGrid, GridInput } from "./modules";
+import {
+  WorkerManager,
+  Canvas,
+  SharedGrid,
+  GridInput,
+  CheckboxManager,
+} from "./modules";
 
 const nextButton = document.querySelector(".button--start");
 const clearButton = document.querySelector(".button--clear");
@@ -13,6 +19,11 @@ const gridInput = new GridInput(
 );
 
 const canvas = new Canvas("#canvas", gridInput.gridHeight, gridInput.gridWidth);
+
+const checkboxManager = new CheckboxManager(
+  ".input--parallel > input",
+  ".input--render > input"
+);
 
 let workerManager = new WorkerManager(
   gridInput.gridHeight,
@@ -32,13 +43,17 @@ const render = () => {
         canvas.fillCellAlive(i, j);
       else canvas.fillCellDead(i, j);
 };
-render();
+
+const draw = () => {
+  requestAnimationFrame(render);
+};
+draw();
 
 let clicked = false;
 window.addEventListener("gridChange", () => {
   if (clicked) {
     clicked = !clicked;
-    clearTimeout(timeoutId);
+    clearTimeout(intervalId);
     nextButton.innerHTML = "Start";
   }
   workerManager.destroyWebWorkers();
@@ -51,12 +66,14 @@ window.addEventListener("gridChange", () => {
     }
   });
   canvas.setGrid(gridInput.gridHeight, gridInput.gridWidth);
-  render();
+  draw();
 });
 
 const rerenderEvent = new Event("rerender");
 window.addEventListener("rerender", () => {
-  render();
+  if (checkboxManager.render) {
+    draw();
+  }
 });
 
 canvas.canvas.onmousedown = ({ offsetX, offsetY }) => {
@@ -76,26 +93,26 @@ workerManager.scatterListener("gridAnswer", () => {
   }
 });
 
-let timeoutId;
+let intervalId;
 const timeoutNext = () => {
-  workerManager.calcNextStateParallel();
-  //render();
-  timeoutId = setTimeout(timeoutNext, 150);
+  intervalId = setInterval(() => {
+    workerManager.calcNextStateParallel();
+  }, 150);
 };
 
 nextButton.onclick = () => {
   clicked = !clicked;
   nextButton.innerHTML = clicked ? "Stop" : "Start";
   if (clicked) timeoutNext();
-  else clearTimeout(timeoutId);
+  else clearInterval(intervalId);
 };
 
 clearButton.onclick = () => {
   workerManager.clearDisplaySharedGrid();
-  render();
+  draw();
 };
 
 randomizeButton.onclick = () => {
   workerManager.randomizeDisplaySharedGrid();
-  render();
+  draw();
 };
