@@ -15,7 +15,7 @@ export default class GridInput {
     this.#widthInput.oninput = this.handleChange(this.#widthInput);
   }
 
-  handleChange(input) {
+  handleChange() {
     return () => {
       const e = new Event("gridChange");
       window.dispatchEvent(e);
@@ -25,8 +25,6 @@ export default class GridInput {
   get gridHeight() {
     return !this.#heightInput.value
       ? GridInput.#DEFAULT_HEIGHT
-      : parseInt(this.#heightInput.value) > this.#heightInput.max
-      ? parseInt(this.#heightInput.max)
       : parseInt(this.#heightInput.value) < this.#heightInput.min
       ? parseInt(this.#heightInput.min)
       : parseInt(this.#heightInput.value);
@@ -35,8 +33,6 @@ export default class GridInput {
   get gridWidth() {
     return !this.#widthInput.value
       ? GridInput.#DEFAULT_WIDTH
-      : parseInt(this.#widthInput.value) > this.#widthInput.max
-      ? parseInt(this.#widthInput.max)
       : parseInt(this.#widthInput.value) < this.#widthInput.min
       ? parseInt(this.#widthInput.min)
       : parseInt(this.#widthInput.value);
