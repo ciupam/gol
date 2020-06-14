@@ -25,15 +25,11 @@ const checkboxManager = new CheckboxManager(
   ".input--render > input"
 );
 
-let workerManager = new WorkerManager(
-  gridInput.gridHeight,
-  gridInput.gridWidth
-);
-workerManager.initWebWorkers();
+let workerManager;
 
 window.addEventListener("resize", () => {
   canvas.setSize();
-  render();
+  draw();
 });
 
 const render = () => {
@@ -45,35 +41,68 @@ const render = () => {
 };
 
 const draw = () => {
-  requestAnimationFrame(render);
+  if (checkboxManager.render) {
+    requestAnimationFrame(render);
+  }
 };
 draw();
 
-let clicked = false;
-window.addEventListener("gridChange", () => {
-  if (clicked) {
-    clicked = !clicked;
-    clearTimeout(intervalId);
-    nextButton.innerHTML = "Start";
-  }
-  workerManager.destroyWebWorkers();
+let dateNow;
+let timeoutId;
+const initWorkerManager = () => {
   workerManager = new WorkerManager(gridInput.gridHeight, gridInput.gridWidth);
   workerManager.initWebWorkers();
   workerManager.scatterListener("gridAnswer", () => {
-    if (workerManager.incrGridAnswer()) {
+    if (
+      workerManager.incrGridAnswer(checkboxManager.parallel ? undefined : 1)
+    ) {
+      console.log(new Date() - dateNow - 100);
+      dateNow = new Date();
       workerManager.toggleDisplayFlag();
       window.dispatchEvent(rerenderEvent);
+      if (clicked) {
+        timeoutId = setTimeout(calcNextState, 100);
+      }
     }
   });
+};
+initWorkerManager();
+
+const calcNextState = () => {
+  workerManager.calcNextStateParallel(checkboxManager.parallel ? undefined : 1);
+};
+
+let clicked = false;
+nextButton.onclick = () => {
+  clicked = !clicked;
+  nextButton.innerHTML = clicked ? "Stop" : "Start";
+  if (clicked) {
+    dateNow = new Date();
+    calcNextState();
+  } else {
+    clearTimeout(timeoutId);
+  }
+};
+
+window.addEventListener("gridChange", () => {
+  if (clicked) {
+    clicked = !clicked;
+    nextButton.innerHTML = "Start";
+  } else {
+    clearTimeout(timeoutId);
+  }
+
+  workerManager.destroyWebWorkers();
+  initWorkerManager();
+
   canvas.setGrid(gridInput.gridHeight, gridInput.gridWidth);
+
   draw();
 });
 
 const rerenderEvent = new Event("rerender");
 window.addEventListener("rerender", () => {
-  if (checkboxManager.render) {
-    draw();
-  }
+  draw();
 });
 
 canvas.canvas.onmousedown = ({ offsetX, offsetY }) => {
@@ -84,27 +113,6 @@ canvas.canvas.onmousedown = ({ offsetX, offsetY }) => {
   else canvas.fillCellAlive(...cords);
 
   workerManager.toggleCellToDisplay(...cords);
-};
-
-workerManager.scatterListener("gridAnswer", () => {
-  if (workerManager.incrGridAnswer()) {
-    workerManager.toggleDisplayFlag();
-    window.dispatchEvent(rerenderEvent);
-  }
-});
-
-let intervalId;
-const timeoutNext = () => {
-  intervalId = setInterval(() => {
-    workerManager.calcNextStateParallel();
-  }, 150);
-};
-
-nextButton.onclick = () => {
-  clicked = !clicked;
-  nextButton.innerHTML = clicked ? "Stop" : "Start";
-  if (clicked) timeoutNext();
-  else clearInterval(intervalId);
 };
 
 clearButton.onclick = () => {
