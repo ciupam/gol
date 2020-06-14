@@ -92,12 +92,15 @@ export default class WorkerManager {
     this.toggleDisplayFlag();
   }
 
-  calcNextStateParallel() {
-    const len = this.#sharedGrid.height * this.#sharedGrid.width;
-    const mod = len % this.#workerNo;
-    const share = Math.floor(len / this.#workerNo);
+  calcNextStateParallel(n = this.#workerNo) {
+    this.#receivedGridAnswers = 0;
+    if (n > this.#workerNo) n = this.#workerNo;
 
-    const a = this.#workerNo - mod;
+    const len = this.#sharedGrid.height * this.#sharedGrid.width;
+    const mod = len % n;
+    const share = Math.floor(len / n);
+
+    const a = n - mod;
 
     for (let i = 0; i < a; i++)
       this.#workers[i].sendQuery(
@@ -108,7 +111,7 @@ export default class WorkerManager {
 
     const offset = share * a;
 
-    for (let i = a; i < this.#workerNo; i++)
+    for (let i = a; i < n; i++)
       this.#workers[i].sendQuery(
         "setNextShareState",
         offset + (i - a) * (share + 1),
@@ -125,8 +128,9 @@ export default class WorkerManager {
   }
 
   // true if answers received from all threads, false - otherwise
-  incrGridAnswer() {
-    if (++this.#receivedGridAnswers >= this.#workerNo) {
+  incrGridAnswer(n = this.#workerNo) {
+    if (n > this.#workerNo) n = this.#workerNo;
+    if (++this.#receivedGridAnswers >= n) {
       this.#receivedGridAnswers = 0;
       return true;
     }
